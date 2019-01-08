@@ -67,12 +67,12 @@ namespace CSSAtlasGen
         {
             string folder = null;
             string filter = "*.*";
-            string outputPath = Directory.GetCurrentDirectory();
+            string atlasPath = Directory.GetCurrentDirectory();
             string cssPath = null;
             string jsonPath = null;
             string xmlPath = null;
             string csvPath = null;
-            string outputExtension = "jpg";
+            string atlasExtension = "jpg";
             string prefix = null;
             int resize = 0;
 
@@ -101,8 +101,8 @@ namespace CSSAtlasGen
                     case "input.path": folder = val; break;
                     case "input.filter": filter = val; break;
                     case "prefix": prefix = val; break;
-                    case "output.extension": outputExtension = val.Replace(".", ""); break;
-                    case "output.path": outputPath = val; break;
+                    case "atlas.extension": atlasExtension = val.Replace(".", ""); break;
+                    case "atlas.path": atlasPath = val; break;
                     case "output.resize": resize = int.Parse(val); break;
                     case "css.path": cssPath = val; break;
                     case "json.path": jsonPath = val; break;
@@ -121,7 +121,7 @@ namespace CSSAtlasGen
                 return;
             }
 
-            FixPath(ref outputPath);
+            FixPath(ref atlasPath);
             FixPath(ref cssPath);
             FixPath(ref jsonPath);
             FixPath(ref xmlPath);
@@ -139,7 +139,7 @@ namespace CSSAtlasGen
                 return;
             }
 
-            var outPicName = prefix + "." + outputExtension;
+            var outPicName = prefix + "." + atlasExtension;
             var outCSSName = prefix + ".css";
 
             var files = Directory.GetFiles(folder, filter);
@@ -266,9 +266,9 @@ namespace CSSAtlasGen
                     }
                 }
 
-                output.Save(outputPath + outPicName);
+                output.Save(atlasPath + outPicName);
 
-                Console.WriteLine("Generated " + outputPath + outPicName);
+                Console.WriteLine("Generated " + atlasPath + outPicName);
 
                 if (cssPath != null)
                 {
