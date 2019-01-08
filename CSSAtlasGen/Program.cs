@@ -49,7 +49,7 @@ namespace CSSAtlasGen
                 switch (key)
                 {
                     case "input.path": folder = val; break;
-                    case "filter": filter = val; break;
+                    case "input.filter": filter = val; break;
                     case "prefix": prefix = val; break;
                     case "output.extension": outputExtension = val; break;
                     case "output.path": outputPath = val; break;
