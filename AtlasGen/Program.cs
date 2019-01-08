@@ -101,7 +101,7 @@ namespace CSSAtlasGen
                     case "input.path": folder = val; break;
                     case "input.filter": filter = val; break;
                     case "prefix": prefix = val; break;
-                    case "output.extension": outputExtension = val; break;
+                    case "output.extension": outputExtension = val.Replace(".", ""); break;
                     case "output.path": outputPath = val; break;
                     case "output.resize": resize = int.Parse(val); break;
                     case "css.path": cssPath = val; break;
