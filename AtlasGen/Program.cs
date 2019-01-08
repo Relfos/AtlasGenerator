@@ -103,7 +103,7 @@ namespace CSSAtlasGen
                     case "prefix": prefix = val; break;
                     case "atlas.extension": atlasExtension = val.Replace(".", ""); break;
                     case "atlas.path": atlasPath = val; break;
-                    case "output.resize": resize = int.Parse(val); break;
+                    case "resize": resize = int.Parse(val); break;
                     case "css.path": cssPath = val; break;
                     case "json.path": jsonPath = val; break;
                     case "xml.path": xmlPath = val; break;
