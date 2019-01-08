@@ -1,0 +1,7 @@
+C:\Code\css_atlas_generator\CSSAtlasGen\bin\Debug\CSSAtlasGen.exe.config
+C:\Code\css_atlas_generator\CSSAtlasGen\bin\Debug\CSSAtlasGen.exe
+C:\Code\css_atlas_generator\CSSAtlasGen\bin\Debug\CSSAtlasGen.pdb
+C:\Code\css_atlas_generator\CSSAtlasGen\obj\Debug\CSSAtlasGen.csprojAssemblyReference.cache
+C:\Code\css_atlas_generator\CSSAtlasGen\obj\Debug\CSSAtlasGen.csproj.CoreCompileInputs.cache
+C:\Code\css_atlas_generator\CSSAtlasGen\obj\Debug\CSSAtlasGen.exe
+C:\Code\css_atlas_generator\CSSAtlasGen\obj\Debug\CSSAtlasGen.pdb
