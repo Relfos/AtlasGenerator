@@ -21,7 +21,7 @@ namespace CSSAtlasGen
             string folder = null;
             string filter = "*.*";
             string outputPath = Directory.GetCurrentDirectory();
-            string cssPath = outputPath;
+            string cssPath = null;
             string outputExtension = "jpg";
             string prefix = null;
             int resize = 0;
@@ -73,7 +73,7 @@ namespace CSSAtlasGen
                 outputPath += "\\";
             }
 
-            if (!cssPath.EndsWith("\\"))
+            if (cssPath != null && !cssPath.EndsWith("\\"))
             {
                 cssPath += "\\";
             }
@@ -83,7 +83,7 @@ namespace CSSAtlasGen
                 Directory.CreateDirectory(outputPath);
             }
 
-            if (!Directory.Exists(cssPath))
+            if (cssPath != null && !Directory.Exists(cssPath))
             {
                 Directory.CreateDirectory(cssPath);
             }
@@ -231,59 +231,62 @@ namespace CSSAtlasGen
 
                 Console.WriteLine("Generated " + outputPath + outPicName);
 
-                var sb = new StringBuilder();
-
-                int index = 0;
-                foreach (var file in files)
+                if (cssPath != null)
                 {
-                    var name = Path.GetFileNameWithoutExtension(file).ToLower();
+                    var sb = new StringBuilder();
 
-                    if (index > 0)
+                    int index = 0;
+                    foreach (var file in files)
                     {
-                        sb.Append(", ");
+                        var name = Path.GetFileNameWithoutExtension(file).ToLower();
+
+                        if (index > 0)
+                        {
+                            sb.Append(", ");
+                        }
+
+                        if (index % side == side - 1)
+                        {
+                            sb.AppendLine();
+                        }
+
+                        sb.Append($".{prefix}-{name}");
+
+                        index++;
                     }
 
-                    if (index % side == side - 1)
+                    sb.Append('{');
+                    sb.AppendLine();
+                    sb.AppendLine($"\tbackground-image: url('{outPicName}');");
+                    sb.AppendLine("\tbackground-repeat: no-repeat;");
+                    sb.Append('}');
+                    sb.AppendLine();
+
+                    foreach (var file in files)
                     {
+                        int x, y;
+                        packer.GetRect(file, out x, out y);
+
+                        var margin = margins[file];
+                        x += margin.X;
+                        y += margin.Y;
+
+                        var name = Path.GetFileNameWithoutExtension(file).ToLower();
+                        var img = images[file];
+
+                        sb.AppendLine();
+                        sb.AppendLine("." + prefix + "-" + name + " {");
+                        sb.AppendLine($"\twidth: {img.Width}px;");
+                        sb.AppendLine($"\theight: {img.Height}px;");
+                        sb.AppendLine($"\tbackground-position: -{x}px -{y}px;");
+                        sb.Append('}');
                         sb.AppendLine();
                     }
 
-                    sb.Append($".{prefix}-{name}");
+                    File.WriteAllText(cssPath + outCSSName, sb.ToString());
 
-                    index++;
+                    Console.WriteLine("Generated " + cssPath + outCSSName);
                 }
-
-                sb.Append('{');
-                sb.AppendLine();
-                sb.AppendLine($"\tbackground-image: url('{outPicName}');");
-                sb.AppendLine("\tbackground-repeat: no-repeat;");
-                sb.Append('}');
-                sb.AppendLine();
-
-                foreach (var file in files)
-                {
-                    int x, y;
-                    packer.GetRect(file, out x, out y);
-
-                    var margin = margins[file];
-                    x += margin.X;
-                    y += margin.Y;
-
-                    var name = Path.GetFileNameWithoutExtension(file).ToLower();
-                    var img = images[file];
-
-                    sb.AppendLine();
-                    sb.AppendLine("." + prefix + "-" + name + " {");
-                    sb.AppendLine($"\twidth: {img.Width}px;");
-                    sb.AppendLine($"\theight: {img.Height}px;");
-                    sb.AppendLine($"\tbackground-position: -{x}px -{y}px;");
-                    sb.Append('}');
-                    sb.AppendLine();
-                }
-
-                File.WriteAllText(cssPath + outCSSName, sb.ToString());
-
-                Console.WriteLine("Generated " + cssPath + outCSSName);
             }
             else
             {
