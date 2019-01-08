@@ -9,7 +9,7 @@ Useful for webpage optimization, allowing you to pack all images in the website 
 
 Example:
 ```
-atlasgen.exe --folder=D:\some\path\to\images\here -input.filter=*.jpg -prefix=team -output.extension=jpg -resize=240
+atlasgen.exe -input.path=D:\some\path\to\images\here -input.filter=*.jpg -prefix=team -atlas.extension=jpg -resize=240
 ```
 
 ## Options list
