@@ -9,26 +9,28 @@ namespace CSSAtlasGen
 {
     class Program
     {
-        // example args: --folder=D:\code\Sites\Phantasma_Site\team --filter=*.jpg --prefix=team -output=jpg --resize=240
+        // example args: -input.path=D:\some\path\to\images\here -filter=*.jpg -prefix=team -output.extension=jpg -output.path= -output.resize=240
         static void Main(string[] args)
         {
             string folder = null;
             string filter = "*.*";
+            string outputPath = Directory.GetCurrentDirectory();
+            string cssPath = outputPath;
             string outputExtension = "jpg";
-            string outputPrefix = null;
+            string prefix = null;
             int resize = 0;
 
             foreach (var entry in args)
             {
                 var arg = entry;
 
-                if (!arg.StartsWith("--"))
+                if (!arg.StartsWith("-"))
                 {
                     Console.WriteLine("Invalid argument: " + arg);
                     return;
                 }
 
-                arg = arg.Substring(2);
+                arg = arg.Substring(1);
 
                 var temp = arg.Split(new char[] { '=' }, 2);
 
@@ -37,28 +39,50 @@ namespace CSSAtlasGen
 
                 switch (key)
                 {
-                    case "folder": folder = val; break;
+                    case "input.path": folder = val; break;
                     case "filter": filter = val; break;
-                    case "prefix": outputPrefix = val; break;
-                    case "output": outputExtension = val; break;
-                    case "resize": resize = int.Parse(val); break;
+                    case "prefix": prefix = val; break;
+                    case "output.extension": outputExtension = val; break;
+                    case "output.path": outputPath = val; break;
+                    case "output.resize": resize = int.Parse(val); break;
+                    case "css.path": cssPath = val; break;
                 }
+            }
+
+            if (!outputPath.EndsWith("\\"))
+            {
+                outputPath += "\\";
+            }
+
+            if (!cssPath.EndsWith("\\"))
+            {
+                cssPath += "\\";
+            }
+
+            if (!Directory.Exists(outputPath))
+            {
+                Directory.CreateDirectory(outputPath);
+            }
+
+            if (!Directory.Exists(cssPath))
+            {
+                Directory.CreateDirectory(cssPath);
             }
 
             if (folder == null)
             {
-                Console.WriteLine("Please specify a folder. Eg: --folder=some_path");
+                Console.WriteLine("Please specify a folder. Eg: -input.path=some_path");
                 return;
             }
 
-            if (outputPrefix == null)
+            if (prefix == null)
             {
                 Console.WriteLine("Please specify a atlas prefix. Eg: --prefix=something");
                 return;
             }
 
-            var outPicName = outputPrefix + "." + outputExtension;
-            var outCSSName = outputPrefix + ".css";
+            var outPicName = prefix + "." + outputExtension;
+            var outCSSName = prefix + ".css";
 
             var files = Directory.GetFiles(folder, filter);
 
@@ -109,12 +133,14 @@ namespace CSSAtlasGen
 
                         var img = images[file];
                         g.DrawImage(img, x, y, img.Width, img.Height);
+
+                        Console.WriteLine("Merged " + file);
                     }
                 }
 
-                output.Save(outPicName);
+                output.Save(outputPath + outPicName);
 
-                Console.WriteLine("Generated " + outPicName);
+                Console.WriteLine("Generated " + outputPath + outPicName);
 
                 var sb = new StringBuilder();
 
@@ -133,7 +159,7 @@ namespace CSSAtlasGen
                         sb.AppendLine();
                     }
 
-                    sb.Append($".{outputPrefix}-{name}");
+                    sb.Append($".{prefix}-{name}");
 
                     index++;
                 }
@@ -154,7 +180,7 @@ namespace CSSAtlasGen
                     var img = images[file];
 
                     sb.AppendLine();
-                    sb.AppendLine("." + outputPrefix + "-" + name + " {");
+                    sb.AppendLine("." + prefix + "-" + name + " {");
                     sb.AppendLine($"\twidth: {img.Width}px;");
                     sb.AppendLine($"\theight: {img.Height}px;");
                     sb.AppendLine($"\tbackground-position: -{x}px -{y}px;");
@@ -162,9 +188,9 @@ namespace CSSAtlasGen
                     sb.AppendLine();
                 }
 
-                File.WriteAllText(outCSSName, sb.ToString());
+                File.WriteAllText(cssPath + outCSSName, sb.ToString());
 
-                Console.WriteLine("Generated " + outCSSName);
+                Console.WriteLine("Generated " + cssPath + outCSSName);
             }
             else
             {
