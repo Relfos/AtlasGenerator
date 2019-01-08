@@ -1,5 +1,5 @@
-CSSAtlasGen/obj/
-CSSAtlasGen/bin/
+AtlasGen/obj/*
+AtlasGen/bin/*
 .vs/
-
+packages/
 *.user

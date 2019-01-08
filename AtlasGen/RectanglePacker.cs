@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Lunar.Utils
+namespace LunarLabs.Utils
 {
     public class RectanglePacker<T>
     {

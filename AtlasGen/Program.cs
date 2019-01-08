@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text;
-using Lunar.Utils;
+using LunarLabs.Utils;
+using LunarLabs.Parser;
+using LunarLabs.Parser.JSON;
+using LunarLabs.Parser.CSV;
+using LunarLabs.Parser.XML;
 
 namespace CSSAtlasGen
 {
@@ -15,6 +19,49 @@ namespace CSSAtlasGen
 
     class Program
     {
+        static void FixPath(ref string path)
+        {
+            if (path == null)
+            {
+                return;
+            }
+
+            if (!path.EndsWith("\\"))
+            {
+                path += "\\";
+            }
+
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+        }
+
+        static DataNode ExportToNode(string[] files, Dictionary<string, Bitmap> images, Dictionary<string, Margin> margins, RectanglePacker<string> packer, bool giveNames)
+        {
+            var node = DataNode.CreateArray("images");
+            foreach (var file in files)
+            {
+                int x, y;
+                packer.GetRect(file, out x, out y);
+
+                var margin = margins[file];
+                x += margin.X;
+                y += margin.Y;
+
+                var img = images[file];
+
+                var child = DataNode.CreateObject(giveNames ? "image": null);
+                child.AddField("name", Path.GetFileNameWithoutExtension(file));
+                child.AddField("x", x);
+                child.AddField("y", y);
+                child.AddField("width", img.Width);
+                child.AddField("height", img.Height);
+                node.AddNode(child);
+            }
+            return node;
+        }
+
         // example args: -input.path=D:\some\path\to\images\here -filter=*.jpg -prefix=team -output.extension=jpg -output.path= -output.resize=240
         static void Main(string[] args)
         {
@@ -22,6 +69,9 @@ namespace CSSAtlasGen
             string filter = "*.*";
             string outputPath = Directory.GetCurrentDirectory();
             string cssPath = null;
+            string jsonPath = null;
+            string xmlPath = null;
+            string csvPath = null;
             string outputExtension = "jpg";
             string prefix = null;
             int resize = 0;
@@ -55,6 +105,9 @@ namespace CSSAtlasGen
                     case "output.path": outputPath = val; break;
                     case "output.resize": resize = int.Parse(val); break;
                     case "css.path": cssPath = val; break;
+                    case "json.path": jsonPath = val; break;
+                    case "xml.path": xmlPath = val; break;
+                    case "csv.path": csvPath = val; break;
                     case "margin.X": globalMargin.X = int.Parse(val); break;
                     case "margin.Y": globalMargin.Y = int.Parse(val); break;
                     case "margin": globalMargin.X = int.Parse(val); globalMargin.Y = globalMargin.X; break;
@@ -68,25 +121,11 @@ namespace CSSAtlasGen
                 return;
             }
 
-            if (!outputPath.EndsWith("\\"))
-            {
-                outputPath += "\\";
-            }
-
-            if (cssPath != null && !cssPath.EndsWith("\\"))
-            {
-                cssPath += "\\";
-            }
-
-            if (!Directory.Exists(outputPath))
-            {
-                Directory.CreateDirectory(outputPath);
-            }
-
-            if (cssPath != null && !Directory.Exists(cssPath))
-            {
-                Directory.CreateDirectory(cssPath);
-            }
+            FixPath(ref outputPath);
+            FixPath(ref cssPath);
+            FixPath(ref jsonPath);
+            FixPath(ref xmlPath);
+            FixPath(ref csvPath);
 
             if (folder == null)
             {
@@ -286,6 +325,31 @@ namespace CSSAtlasGen
                     File.WriteAllText(cssPath + outCSSName, sb.ToString());
 
                     Console.WriteLine("Generated " + cssPath + outCSSName);
+                }
+
+                if (xmlPath!= null || csvPath != null || jsonPath != null)
+                {
+
+                    if (jsonPath != null)
+                    {
+                        var node = ExportToNode(files, images, margins, packer, false);
+                        var json = JSONWriter.WriteToString(node);
+                        File.WriteAllText(jsonPath + prefix + ".json", json);
+                    }
+
+                    if (xmlPath != null)
+                    {
+                        var node = ExportToNode(files, images, margins, packer, true);
+                        var xml = XMLWriter.WriteToString(node);
+                        File.WriteAllText(xmlPath + prefix + ".xml", xml);
+                    }
+
+                    if (csvPath != null)
+                    {
+                        var node = ExportToNode(files, images, margins, packer, false);
+                        var csv = CSVWriter.WriteToString(node);
+                        File.WriteAllText(csvPath + prefix + ".csv", csv);
+                    }
                 }
             }
             else
