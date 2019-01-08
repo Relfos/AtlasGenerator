@@ -1,3 +1,5 @@
 CSSAtlasGen/obj/
 CSSAtlasGen/bin/
 .vs/
+
+*.user
